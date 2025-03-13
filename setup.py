@@ -122,26 +122,32 @@ def create_basic_files():
 
 
 def setup_virtualenv():
-    """Create virtual environment and install requirements."""
+    """Create virtual environment, upgrade pip, and install requirements."""
     venv_dir = "venv"
 
     # Create virtual environment
     if not os.path.exists(venv_dir):
         print("\n🔄 Creating virtual environment...")
-        run_command(f"python -m venv {venv_dir}")
+        run_command("python -m venv venv")
         print("✓ Virtual environment created")
     else:
         print("\n✓ Virtual environment already exists")
 
-    # Platform-specific paths
-    pip_executable = os.path.join(venv_dir, "bin", "pip")
+    # Determine activation command based on OS
     if sys.platform == "win32":
-        pip_executable = os.path.join(venv_dir, "Scripts", "pip.exe")
+        activate_cmd = "call venv\\Scripts\\activate.bat"
+    else:
+        activate_cmd = "source venv/bin/activate"
 
-    # Install requirements if file exists
+    # Upgrade pip in activated environment
+    print("\n🔄 Upgrading pip...")
+    run_command(f"{activate_cmd} && python -m pip install --upgrade pip")
+    print("✓ pip upgraded")
+
+    # Install requirements if exists
     if os.path.exists("requirements.txt"):
         print("\n📦 Installing dependencies...")
-        run_command(f'"{pip_executable}" install -r requirements.txt')
+        run_command(f"{activate_cmd} && pip install -r requirements.txt")
         print("✓ Dependencies installed")
     else:
         print("\nℹ️ No requirements.txt found - skipping dependency installation")
@@ -149,9 +155,9 @@ def setup_virtualenv():
     # Print activation instructions
     print("\n🔌 Activate virtual environment with:")
     if sys.platform == "win32":
-        print(f"  {venv_dir}\\Scripts\\activate.bat")
+        print("  venv\\Scripts\\activate.bat")
     else:
-        print(f"  source {venv_dir}/bin/activate")
+        print("  source venv/bin/activate")
 
 
 def main():
