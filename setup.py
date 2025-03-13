@@ -46,7 +46,13 @@ def create_github_repo(repo_name, visibility="public"):
         
         # Create repo with source and remote flags
         run_command(f"gh repo create {repo_name} --{visibility} --source=. --remote=origin --push")
-        print(f"✓ GitHub repository created: https://github.com/{repo_name}")
+        
+        # Get GitHub username from authenticated user
+        result = run_command("gh api user -q .login")
+        github_username = result.stdout.strip()
+        
+        print(f"✓ GitHub repository created: https://github.com/{github_username}/{repo_name}")
+        return f"https://github.com/{github_username}/{repo_name}"
     except Exception as e:
         print(f"✗ Failed to create repository: {str(e)}")
         sys.exit(1)
@@ -111,11 +117,11 @@ def main():
     
     # GitHub setup
     github_auth()
-    create_github_repo(repo_name, visibility)
+    repo_url = create_github_repo(repo_name, visibility)
     
-    # Final push
+    # Final output
     print("\n✅ Setup complete!")
-    print(f"➤ Remote URL: https://github.com/{repo_name}")
+    print(f"➤ Remote URL: {repo_url}")
     print(f"➤ Local directory: {os.getcwd()}")
 
 if __name__ == "__main__":
