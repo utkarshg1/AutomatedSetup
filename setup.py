@@ -1,7 +1,6 @@
 import os
 import subprocess
 import sys
-import requests
 
 def run_command(command, check=True):
     """Run a shell command with error handling."""
