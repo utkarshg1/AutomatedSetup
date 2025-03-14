@@ -1,20 +1,35 @@
 import os
 import subprocess
 import sys
+from urllib.request import urlretrieve
 
 
-def run_command(command, check=True):
-    """Run a shell command with error handling."""
+def run_command(command, check=True, live_output=False):
+    """Run a shell command with error handling and optional real-time output."""
     try:
-        result = subprocess.run(
-            command,
-            shell=True,
-            check=check,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        return result
+        if live_output:
+            # Run command and stream output directly
+            process = subprocess.Popen(
+                command,
+                shell=True,
+                stdout=sys.stdout,
+                stderr=sys.stderr,
+                text=True,
+            )
+            process.communicate()
+            if process.returncode != 0 and check:
+                sys.exit(process.returncode)
+        else:
+            # Capture output normally
+            result = subprocess.run(
+                command,
+                shell=True,
+                check=check,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            return result
     except subprocess.CalledProcessError as e:
         print(f"✗ Error: {e.stderr}")
         sys.exit(1)
@@ -35,7 +50,7 @@ def github_auth():
     result = run_command("gh auth status", check=False)
     if result.returncode != 0:
         print("🔑 Authenticating with GitHub...")
-        run_command("gh auth login --web -h github.com")
+        run_command("gh auth login --web -h github.com", live_output=True)
     else:
         print("✓ GitHub authentication verified")
 
@@ -89,30 +104,21 @@ def initialize_local_repo():
     print("✓ Local Git repository initialized")
 
 
+def download_gitignore_python():
+    try:
+        url = "https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Python.gitignore"
+        urlretrieve(url, ".gitignore")
+        print("✓ Python gitignore downloaded successfully")
+    except Exception as e:
+        print(f"✗ Failed to download gitignore : {str(e)}")
+
+
 def create_basic_files():
     """Create essential project files if missing."""
     print("📂 Creating basic project structure...")
 
     if not os.path.exists(".gitignore"):
-        with open(".gitignore", "w") as f:
-            f.write(
-                "\n".join(
-                    [
-                        "# Environments",
-                        "venv/",
-                        ".env",
-                        "*.pyc",
-                        "__pycache__/",
-                        "# Editors",
-                        ".vscode/",
-                        ".idea/",
-                        "# Local",
-                        "*.swp",
-                        "*.swo",
-                    ]
-                )
-            )
-        print("✓ Created .gitignore")
+        download_gitignore_python()
 
     if not os.path.exists("README.md"):
         repo_name = os.path.basename(os.getcwd())
@@ -141,13 +147,17 @@ def setup_virtualenv():
 
     # Upgrade pip in activated environment
     print("\n🔄 Upgrading pip...")
-    run_command(f"{activate_cmd} && python -m pip install --upgrade pip")
+    run_command(
+        f"{activate_cmd} && python -m pip install --upgrade pip", live_output=True
+    )
     print("✓ pip upgraded")
 
     # Install requirements if exists
     if os.path.exists("requirements.txt"):
         print("\n📦 Installing dependencies...")
-        run_command(f"{activate_cmd} && pip install -r requirements.txt")
+        run_command(
+            f"{activate_cmd} && pip install -r requirements.txt", live_output=True
+        )
         print("✓ Dependencies installed")
     else:
         print("\nℹ️ No requirements.txt found - skipping dependency installation")
