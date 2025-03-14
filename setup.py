@@ -57,6 +57,7 @@ def github_auth():
     else:
         print("✓ GitHub authentication verified")
 
+
 def get_github_username():
     result = run_command("gh api user -q .login")
     return result.stdout.strip()
@@ -89,10 +90,10 @@ def create_github_repo(repo_name, visibility="public"):
 
 def setup_git_config():
     """Set basic Git configuration if missing."""
-    # Get GitHub username from authenticated user
-    github_username = get_github_username()
+
     print("⚙️ Checking Git global configuration...")
     if not run_command("git config --global user.name", check=False).stdout.strip():
+        github_username = get_github_username()
         run_command(f'git config --global user.name "{github_username}"')
 
     if not run_command("git config --global user.email", check=False).stdout.strip():
