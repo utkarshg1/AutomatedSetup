@@ -104,13 +104,12 @@ def initialize_local_repo():
     print("✓ Local Git repository initialized")
 
 
-def download_gitignore_python():
+def download_files(url, filename):
     try:
-        url = "https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Python.gitignore"
-        urlretrieve(url, ".gitignore")
-        print("✓ Python gitignore downloaded successfully")
+        urlretrieve(url, filename)
+        print(f"✓ File {filename} downloaded successfully")
     except Exception as e:
-        print(f"✗ Failed to download gitignore : {str(e)}")
+        print(f"✗ Failed to download {filename} : {str(e)}")
 
 
 def create_basic_files():
@@ -118,7 +117,14 @@ def create_basic_files():
     print("📂 Creating basic project structure...")
 
     if not os.path.exists(".gitignore"):
-        download_gitignore_python()
+        gitignore_url = "https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Python.gitignore"
+        download_files(gitignore_url, ".gitignore")
+
+    if not os.path.exists("LICENSE"):
+        license_url = (
+            "https://raw.githubusercontent.com/apache/.github/refs/heads/main/LICENSE"
+        )
+        download_files(license_url, "LICENSE")
 
     if not os.path.exists("README.md"):
         repo_name = os.path.basename(os.getcwd())
