@@ -177,6 +177,7 @@ def setup_virtualenv():
 
 
 def main():
+    print("🚀✨ Python Project Automation - Utkarsh Gaikwad ✨🚀")
     print("\n🚀 Project Setup Wizard - Current Directory\n")
 
     # Get user input
