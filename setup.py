@@ -83,14 +83,14 @@ def create_github_repo(repo_name, visibility="public"):
 
 def setup_git_config():
     """Set basic Git configuration if missing."""
-    print("⚙️ Checking Git configuration...")
-    if not run_command("git config user.name", check=False).stdout.strip():
+    print("⚙️ Checking Git global configuration...")
+    if not run_command("git config --global user.name", check=False).stdout.strip():
         username = input("Enter your GitHub username: ").strip()
-        run_command(f'git config user.name "{username}"')
+        run_command(f'git config --global user.name "{username}"')
 
-    if not run_command("git config user.email", check=False).stdout.strip():
+    if not run_command("git config --global user.email", check=False).stdout.strip():
         email = input("Enter your GitHub email: ").strip()
-        run_command(f'git config user.email "{email}"')
+        run_command(f'git config --global user.email "{email}"')
 
 
 def initialize_local_repo():
