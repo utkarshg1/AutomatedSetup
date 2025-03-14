@@ -1,3 +1,6 @@
+# This is a CLI setup file to automate VS code setup for users
+# Created by Utkarsh Gaikwad
+
 import os
 import subprocess
 import sys
